@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+<title>Student Support | Ultra Realism</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+<style>
+:root {
+  --primary: #6366f1;
+  --primary-dark: #4f46e5;
+  --accent: #ec4899;
+  --text-main: #1e293b;
+  --text-muted: #64748b;
+  --card-bg: rgba(255, 255, 255, 0.6);
+  --card-border: rgba(255, 255, 255, 0.6);
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  min-height: 100vh;
+  background: #000;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
+  perspective: 2000px;
+}
+
+.mesh-bg {
+  position: fixed;
+  inset: 0;
+  background: radial-gradient(circle at 50% 50%, #1e1b4b, #000);
+  z-index: -2;
+}
+
+.orb {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(80px);
+  opacity: 0.6;
+  animation: floatOrb 15s infinite ease-in-out alternate;
+}
+.orb-1 { width: 400px; height: 400px; background: #4338ca; top: -100px; left: -100px; }
+.orb-2 { width: 300px; height: 300px; background: #db2777; bottom: -50px; right: -50px; animation-delay: -5s; }
+.orb-3 { width: 250px; height: 250px; background: #0891b2; bottom: 20%; left: 20%; animation-duration: 20s; }
+
+@keyframes floatOrb {
+  0% { transform: translate(0, 0); }
+  100% { transform: translate(50px, 80px); }
+}
+
+.scene {
+  width: 100%;
+  max-width: 440px;
+  padding: 20px;
+  perspective: 1000px;
+}
+
+.card {
+  position: relative;
+  background: var(--card-bg);
+  backdrop-filter: blur(30px) saturate(160%);
+  -webkit-backdrop-filter: blur(30px) saturate(160%);
+  border: 1px solid var(--card-border);
+  border-radius: 30px;
+  padding: 3rem 2.2rem;
+  box-shadow: 
+    0 40px 80px -15px rgba(0, 0, 0, 0.5),
+    inset 0 0 20px rgba(255,255,255,0.5);
+  transform-style: preserve-3d;
+  transform: rotateX(0) rotateY(0);
+  will-change: transform;
+}
+
+.card-glare {
+  position: absolute;
+  inset: 0;
+  border-radius: 30px;
+  background: radial-gradient(
+    circle at 50% 50%, 
+    rgba(255,255,255,0.4) 0%, 
+    rgba(255,255,255,0) 60%
+  );
+  opacity: 0;
+  mix-blend-mode: overlay;
+  pointer-events: none;
+  z-index: 10;
+  transition: opacity 0.3s;
+}
+
+.avatar-container {
+  width: 130px;
+  height: 130px;
+  margin: 0 auto 1.5rem;
+  position: relative;
+  transform-style: preserve-3d; 
+  transform: translateZ(50px);
+}
+
+.avatar-border {
+  position: absolute;
+  inset: -5px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #6366f1, #ec4899);
+  transform: translateZ(-10px);
+  filter: blur(15px);
+  opacity: 0.7;
+}
+
+.avatar {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 4px solid #fff;
+  box-shadow: 0 15px 35px rgba(0,0,0,0.3);
+  position: relative;
+  z-index: 2;
+}
+
+.avatar::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: radial-gradient(circle at 30% 30%, rgba(255,255,255,0.8), transparent 60%);
+  z-index: 3;
+}
+
+h1 {
+  text-align: center;
+  color: var(--text-main);
+  font-weight: 800;
+  font-size: 1.8rem;
+  margin-bottom: 0.5rem;
+  transform: translateZ(30px);
+}
+
+.subtitle {
+  text-align: center;
+  color: var(--text-muted);
+  font-size: 0.95rem;
+  margin-bottom: 2rem;
+  transform: translateZ(25px);
+}
+
+.form-group {
+  position: relative;
+  margin-bottom: 1.4rem;
+  transform: translateZ(20px);
+}
+
+.form-control {
+  width: 100%;
+  padding: 16px 16px 16px 45px;
+  font-size: 1rem;
+  color: var(--text-main);
+  background: rgba(255, 255, 255, 0.6);
+  border: 2px solid transparent;
+  border-radius: 16px;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  font-family: inherit;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+}
+
+.form-control:focus {
+  outline: none;
+  background: #fff;
+  border-color: var(--primary);
+  box-shadow: 0 10px 25px rgba(99, 102, 241, 0.2);
+  transform: scale(1.02);
+}
+
+.form-control::placeholder { color: transparent; }
+
+label {
+  position: absolute;
+  left: 45px;
+  top: 18px;
+  color: var(--text-muted);
+  font-weight: 600;
+  pointer-events: none;
+  transition: 0.3s;
+  transform-origin: left top;
+}
+
+.form-control:focus ~ label,
+.form-control:not(:placeholder-shown) ~ label {
+  transform: translateY(-42px) translateX(-10px) scale(0.9);
+  color: var(--primary-dark);
+}
+
+.icon {
+  position: absolute;
+  left: 16px;
+  top: 19px;
+  color: var(--text-muted);
+  transition: 0.3s;
+}
+
+.form-control:focus ~ .icon { color: var(--primary); }
+
+textarea.form-control { resize: none; min-height: 100px; }
+
+.char-count {
+  position: absolute;
+  bottom: -22px;
+  right: 5px;
+  font-size: 0.75rem;
+  color: rgba(255,255,255,0.7);
+}
+
+.submit-btn {
+  width: 100%;
+  padding: 18px;
+  border: none;
+  border-radius: 16px;
+  background: linear-gradient(135deg, var(--primary), var(--accent));
+  color: white;
+  font-size: 1.1rem;
+  font-weight: 700;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+  transition: 0.4s;
+  transform: translateZ(30px);
+  box-shadow: 0 20px 40px rgba(99, 102, 241, 0.4);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+}
+
+.submit-btn:hover {
+  transform: translateZ(35px) scale(1.02);
+  box-shadow: 0 25px 50px rgba(236, 72, 153, 0.5);
+}
+
+.submit-btn::after {
+  content: '';
+  position: absolute;
+  top: 0; left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+  transition: 0.5s;
+}
+
+.submit-btn:hover::after { left: 100%; }
+
+#response {
+  margin-top: 20px;
+  padding: 15px;
+  border-radius: 12px;
+  display: none;
+  transform: translateZ(40px);
+  animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.success {
+  background: #dcfce7;
+  color: #166534;
+  border: 1px solid #86efac;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+@keyframes popIn {
+  from { opacity: 0; transform: translateZ(40px) scale(0.8); }
+  to { opacity: 1; transform: translateZ(40px) scale(1); }
+}
+
+@media (hover: none) {
+  .card, .avatar-container { transform: none !important; }
+  .scene { padding: 10px; }
+}
+</style>
+</head>
+<body>
+
+<div class="mesh-bg"></div>
+<div class="orb orb-1"></div>
+<div class="orb orb-2"></div>
+<div class="orb orb-3"></div>
+
+<div class="scene" id="scene">
+  <main class="card" id="card">
+    <div class="card-glare" id="glare"></div>
+
+    <div class="avatar-container" id="avatarContainer">
+      <div class="avatar-border"></div>
+      <img class="avatar" src="https://img.freepik.com/free-psd/3d-illustration-person-with-sunglasses_23-2149436188.jpg?w=740" alt="User">
+    </div>
+
+    <h1>Student Support</h1>
+    <p class="subtitle">We're here to help. What's on your mind?</p>
+
+    <form id="issueForm">
+      
+      <div class="form-group">
+        <input type="text" id="name" class="form-control" placeholder=" " required>
+        <label>Full Name</label>
+        <i class="fas fa-user icon"></i>
+      </div>
+
+      <div class="form-group">
+        <select id="department" class="form-control" required style="cursor: pointer;">
+          <option value="" disabled selected hidden></option> 
+          <option>Computer Science</option>
+          <option>Information Technology</option>
+          <option>Mechanical</option>
+          <option>Civil</option>
+        </select>
+        <label>Department</label>
+        <i class="fas fa-building icon"></i>
+      </div>
+
+      <div class="form-group">
+        <textarea id="issue" class="form-control" rows="3" maxlength="200" placeholder=" " required></textarea>
+        <label>Describe your issue</label>
+        <i class="fas fa-comment-dots icon"></i>
+        <div class="char-count"><span id="count">0</span>/200</div>
+      </div>
+
+      <button type="submit" id="submitBtn" class="submit-btn">
+        <span>Submit Ticket</span>
+        <i class="fas fa-paper-plane"></i>
+      </button>
+
+    </form>
+
+    <div id="response"></div>
+  </main>
+</div>
+
+<script>
+const scene = document.getElementById('scene');
+const card = document.getElementById('card');
+const glare = document.getElementById('glare');
+const avatar = document.getElementById('avatarContainer');
+
+const limit = 15;
+const sensitivity = 20;
+const lerpFactor = 0.1;
+
+let currentX = 0, currentY = 0;
+let targetX = 0, targetY = 0;
+
+document.addEventListener('mousemove', (e) => {
+  if (window.matchMedia("(hover: none)").matches) return;
+
+  const rect = scene.getBoundingClientRect();
+  const x = e.clientX - rect.left;
+  const y = e.clientY - rect.top;
+  
+  const centerX = rect.width / 2;
+  const centerY = rect.height / 2;
+
+  const rotateX = ((y - centerY) / centerY) * -limit;
+  const rotateY = ((x - centerX) / centerX) * limit;
+
+  targetX = rotateX;
+  targetY = rotateY;
+
+  const glareX = 50 + ((x - centerX) / centerX) * 40;
+  const glareY = 50 + ((y - centerY) / centerY) * 40;
+  
+  glare.style.background = `radial-gradient(circle at ${glareX}% ${glareY}%, rgba(255,255,255,0.3) 0%, rgba(255,255,255,0) 50%)`;
+  glare.style.opacity = '1';
+});
+
+document.addEventListener('mouseleave', () => {
+  targetX = 0;
+  targetY = 0;
+  glare.style.opacity = '0';
+});
+
+function animate() {
+  currentX += (targetX - currentX) * lerpFactor;
+  currentY += (targetY - currentY) * lerpFactor;
+
+  card.style.transform = `rotateX(${currentX}deg) rotateY(${currentY}deg)`;
+
+  avatar.style.transform = `translateZ(60px) rotateX(${currentX * 0.5}deg) rotateY(${currentY * 0.5}deg) translateX(${currentY * -0.5}px)`;
+
+  requestAnimationFrame(animate);
+}
+
+animate();
+
+const issueInput = document.getElementById('issue');
+const countSpan = document.getElementById('count');
+const form = document.getElementById('issueForm');
+const btn = document.getElementById('submitBtn');
+const responseBox = document.getElementById('response');
+
+issueInput.addEventListener('input', () => {
+  countSpan.textContent = issueInput.value.length;
+});
+
+form.addEventListener('submit', async (e) => {
+  e.preventDefault();
+  btn.disabled = true;
+  const originalHtml = btn.innerHTML;
+  btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Sending...';
+
+  await new Promise(r => setTimeout(r, 1500));
+
+  btn.innerHTML = originalHtml;
+  btn.disabled = false;
+  
+  responseBox.className = 'success';
+  responseBox.innerHTML = '<i class="fas fa-check-circle"></i> <div><b>Ticket Created!</b> We will review shortly.</div>';
+  responseBox.style.display = 'flex';
+  
+  confetti({
+    particleCount: 150,
+    spread: 70,
+    origin: { y: 0.6 },
+    colors: ['#6366f1', '#ec4899', '#ffffff']
+  });
+
+  form.reset();
+  countSpan.textContent = '0';
+});
+</script>
+</body>
+</html>
